@@ -2,19 +2,24 @@ const fs = require("fs");
 const router = require("express").router;
 const store = require("../db/store");
 
-router.get("/notes", (req, res) => {
-  store
-    .getNotes()
-    .then((notes) => res.json(notes))
-    .catch((err) => res.status(500).json(err));
-  res.sendFile(path.join(__dirname, "notes.html"));
+function getNotes() {
+  let data = fs.readFileSync("Develop/db/db.json", "utf8");
+  let notes = JSON.parse(data);
+  for (let i = 0; i < notes.length; i++) {
+    notes[i].id = "" + i;
+  }
+  return notes;
+}
+
+app.get("/api/notes", function (req, res) {
+  notesData = getNotes();
+  res.json(notesData);
 });
 
-router.get("/notes", (req, res) => {
-  store
-    .getNotes()
-    .then((notes) => res.json(notes))
-    .catch((err) => res.status(500).json(err));
+app.post("/api/notes", function (req, res) {
+  notesData.push(req.body);
+  fs.writeFileSync(".Develop/db/db.json", JSON.stringify(notesData), "utf8");
+  res.json(true);
 });
 
 router.delete("/notes/:id", (req, res) => {
